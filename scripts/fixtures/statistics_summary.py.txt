@@ -1,0 +1,12 @@
+"""协作验收用的故意缺陷：重复消费迭代器，且未处理空输入。"""
+
+
+def summarize(values):
+    """接收 values 整数可迭代对象，返回数量、总和、最小值和最大值。"""
+    # 初始错误实现：工程师需真实修改这里，不能改测试绕过。
+    return {
+        "count": len(list(values)),
+        "total": sum(values),
+        "minimum": min(values),
+        "maximum": max(values),
+    }

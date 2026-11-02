@@ -1,0 +1,66 @@
+"""固定验收规格：不得通过修改本文件使错误实现变绿。"""
+
+import unittest
+
+from statistics_summary import summarize
+
+
+class OneShot:
+    """只允许调用一次 __iter__，用于识别重复消费输入。"""
+
+    def __init__(self):
+        """准备一组整数和尚未开始迭代的状态。"""
+        self.used = False  # 是否已经请求过迭代器。
+
+    def __iter__(self):
+        """返回唯一一次迭代器，再次调用视为实现缺陷。"""
+        if self.used:
+            raise AssertionError("输入被重复迭代")
+        self.used = True
+        return iter([2, -1, 6])
+
+
+class SummaryTests(unittest.TestCase):
+    """独立覆盖正常输入、空输入和一次性迭代器。"""
+
+    def test_list(self):
+        """普通列表的四个字段都正确。"""
+        self.assertEqual(summarize([3, -2, 7]), {"count": 3, "total": 8, "minimum": -2, "maximum": 7})
+
+    def test_empty_list(self):
+        """空列表不抛异常，极值明确为 None。"""
+        self.assertEqual(summarize([]), {"count": 0, "total": 0, "minimum": None, "maximum": None})
+
+    def test_empty_generator(self):
+        """空生成器遵循相同的空输入约定。"""
+        self.assertEqual(summarize(value for value in []), {"count": 0, "total": 0, "minimum": None, "maximum": None})
+
+    def test_generator(self):
+        """生成器不能在计数阶段被耗尽。"""
+        self.assertEqual(summarize(value for value in [4, -2, 5]), {"count": 3, "total": 7, "minimum": -2, "maximum": 5})
+
+    def test_iterator(self):
+        """已经构建的迭代器也只消费一次。"""
+        self.assertEqual(summarize(iter([6, 1])), {"count": 2, "total": 7, "minimum": 1, "maximum": 6})
+
+    def test_one_shot(self):
+        """不依赖输入支持多次 __iter__。"""
+        self.assertEqual(summarize(OneShot()), {"count": 3, "total": 7, "minimum": -1, "maximum": 6})
+
+    def test_tuple_duplicates(self):
+        """重复值的计数不能去重。"""
+        self.assertEqual(summarize((2, 2, 2)), {"count": 3, "total": 6, "minimum": 2, "maximum": 2})
+
+    def test_all_negative(self):
+        """全负数最大值不能错误初始化为零。"""
+        self.assertEqual(summarize([-5, -1, -3]), {"count": 3, "total": -9, "minimum": -5, "maximum": -1})
+
+    def test_input_unchanged(self):
+        """汇总不排序、不清空调用方列表。"""
+        values = [4, 1, 3]  # 调用方保留的原始顺序。
+        summarize(values)
+        self.assertEqual(values, [4, 1, 3])
+
+
+if __name__ == "__main__":
+    unittest.main()

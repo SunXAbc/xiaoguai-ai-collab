@@ -1,0 +1,7 @@
+{
+  "package": "Microsoft.Web.WebView2",
+  "version": "1.0.4314.35",
+  "source": "https://api.nuget.org/v3-flatcontainer/microsoft.web.webview2/1.0.4314.35/microsoft.web.webview2.1.0.4314.35.nupkg",
+  "sha512": "70e6a256a3f7066407327c46a59cc034cdb6b545e0c9cae2b322478c818dcc868cb26f225e3ecac7e71e620f916d8c09b734f4d3da9f7054e872f54b63e7a433",
+  "verified_against": "NuGet Catalog SHA512"
+}
